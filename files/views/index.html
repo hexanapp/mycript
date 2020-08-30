@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+  <title>Hello Hexan</title>
+
+  <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="/files/css/style.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+
+  <div class="d-flex justify-content-center align-items-center mt-4">
+    <div class="c-main">
+
+      <div class="d-flex flex-row-reverse align-items-center c-top">
+        <div class="p-2">
+          <button onclick="closeApp()" type="button" class="btn" name="button">close</button>
+        </div>
+        <div class="p-2" style="margin-right:auto;">
+          status : <span id="app-status" >off</span>
+        </div>
+      </div>
+
+      <div class="p-4">
+
+        <h3 class="text-center" >MYCRYPT</h3>
+
+        <div id="login" class="p-3">
+
+          <div class="">
+            <label>Your Name</label>
+            <input type="text" class="form-control" name="name" value="">
+          </div>
+
+          <div class="">
+            <label>Code</label>
+            <input type="text" class="form-control" name="code" value="">
+          </div>
+
+          <div class="">
+            <label>Best friend name</label>
+            <input type="text" class="form-control" name="friend" value="">
+          </div>
+
+          <div class="">
+            <label>Password</label>
+            <input type="text" class="form-control" name="password" value="">
+          </div>
+
+          <div class="text-center mt-4">
+            <button onclick="sendKey()" class="col btn btn-primary" type="button" name="button">login</button>
+          </div>
+
+        </div>
+
+        <div id="info" class="p-3" style="display:none;">
+
+          <div class="">
+            <div class="col">
+              <label>Title</label>
+              <input id="title" type="text" class="form-control" name="title" value="">
+            </div>
+
+            <div class="col">
+              <label>Description</label>
+              <textarea id="description" type="text" class="form-control" name="description" value=""></textarea>
+            </div>
+
+            <div class="text-center">
+              <button onclick="add()" type="button" class="btn" name="button">Add</button>
+            </div>
+          </div>
+
+          <div class="" id="items">
+
+            <div id="item-sample" class="card card-content mt-2" style="display:none;">
+              <h4 item="title" class="text-center p-2" style="background: #3458ae;color: wheat;"></h4>
+              <div item="text" class="p-4 text-center">
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <script src="../node_modules/jquery/dist/jquery.min.js" type="text/javascript"></script>
+  <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script type="text/javascript">
+    var io = io();
+
+    io.on('connect', (socket) => {
+      $('#app-status').text('Runing').css('color','green');
+    });
+
+    io.on('disconnect', () => {
+      $('#app-status').text('Closed app').css('color','red');
+    });
+
+    io.on('login-fail', () => {
+      console.log('login fail');
+    });
+
+    io.on('login-ok', (json) => {
+      showInfo();
+      makeList(json);
+    });
+
+    function closeApp() {
+      io.emit('close-app');
+    }
+
+    function sendKey() {
+      name   = $('input[name="name"]').val();
+      code   = $('input[name="code"]').val();
+      friend = $('input[name="friend"]').val();
+      password = $('input[name="password"]').val();
+
+      io.emit('send-key',name,code,friend,password)
+    }
+
+    function showInfo() {
+      $('#info').fadeIn(0);
+      $('#login').fadeOut(0);
+    }
+
+    function add() {
+      title   = $('#title').val();
+      description   = $('#description').val();
+      console.log(title,description);
+      io.emit('add',title,description);
+    }
+
+    function makeList(array) {
+      $('#items>.card:not(#item-sample)').remove();
+
+      for (var ob of array) {
+        console.log(ob);
+        item = $('#item-sample').clone().fadeIn(0);
+        item.find('*[item="title"]').text(ob.title);
+        item.find('*[item="text"]').text(ob.desc);
+        $('#items').append(item);
+      }
+
+    }
+  </script>
+</body>
+</html>

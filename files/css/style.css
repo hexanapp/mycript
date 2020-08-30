@@ -1,0 +1,13 @@
+.c-main{
+  width: 450px;
+  background: #eaeaea;
+  border-radius: 5px;
+}
+
+.c-top{
+  background: #8c8f93;
+}
+
+.c-status-left{
+  margin-right:auto
+}
